@@ -32,16 +32,24 @@ const args = query.slice(1);
 // console.log(query);
 // console.log(operation !== '--list' && operation !== '-l' && query <= 0);
 if (operation !== '--list' && operation !== '-l' && query <= 0) {
-  console.log('it goes here')
   displayHelp();
   return;
 }
 checkQuery();
 
 function retrieveTasksData() {
+  const dirname = path.dirname(storagePath);
+  const filename = path.basename(storagePath);
+
+  if (!fs.existsSync(dirname)) {
+    // console.log('directory does not exist.');
+    console.log(`created new folder: ${dirname}`);
+    fs.mkdirSync(dirname);
+  }
+
   if (!fs.existsSync(storagePath)) {
     // console.log('File does not exist.');
-    console.log(`created new database: ${path.basename(storagePath)}`);
+    console.log(`created new database: ${filename}`);
     writeDataToFile([]);
   }
 
