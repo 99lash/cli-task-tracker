@@ -1,0 +1,21 @@
+{
+  "name": "cli-task-tracker",
+  "version": "1.0.0",
+  "description": "A command line interface task tracker",
+  "main": "task-app",
+  "scripts": {
+    "start": "node taskcli"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/99lash/cli-task-tracker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/99lash/cli-task-tracker/issues"
+  },
+  "homepage": "https://github.com/99lash/cli-task-tracker#readme"
+}
