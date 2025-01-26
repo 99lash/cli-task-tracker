@@ -35,7 +35,7 @@ Deleting a task
 
     node taskcli --delete <id>
 
-Marking task status as [ todo | in progress | done ]
+Marking a task status as [ todo | in progress | done ]
 
     node taskcli --mark-in-progress <id>
     node taskcli --mark-done <id>
