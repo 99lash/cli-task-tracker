@@ -267,7 +267,7 @@ async function checkQuery() {
       break;
 
     default:
-      displayHelp();
+      console.log(`See "node taskcli --help" for command usage.`);
       break;
   }
 }
