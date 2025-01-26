@@ -81,7 +81,7 @@ function addTask(tasks) {
     tasks.push(newTask);
   });
   writeDataToFile(tasks);
-  listTasks(tasks);
+  console.log(`${Background.blue}Added new task: ${tasks[tasks.length-1].description}.${Color.reset}`);
 }
 
 function listTasks(tasks) {
@@ -94,10 +94,15 @@ function listTasks(tasks) {
     console.log('Provide a valid status to list the tasks.');
     return;
   }
-  const status = (args[0]) ? args[0].toLowerCase() : 'todo';
+  const status = (args[0]) ? args[0].toLowerCase() : '';
   const sortedDescendingTasks = tasks.sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt));
 
-  if (status === 'todo') {
+
+
+  if (status.length === 0) {
+    console.log(sortedDescendingTasks);
+    return;
+  } else if (status === 'todo') {
     // const meow = new Date(tasks[0].createdAt);
     // console.log(meow.toLocaleDateString())
     // console.log(meow.toLocaleTimeString())
@@ -115,14 +120,14 @@ function listTasks(tasks) {
   }
 
   if (status.startsWith('to') || status.endsWith('o')) {
-    console.log(`${Background.red}Incorrect syntax. Do you mean "todo"?${Color.reset}`);
+    console.log(`${Background.red}Incorrect status. Do you mean "todo"?${Color.reset}`);
   } else if (status.startsWith('in') || status.endsWith('s')) {
-    console.log(`${Background.red}Incorrect syntax. Do you mean "in-progress"?${Color.reset}`);
+    console.log(`${Background.red}Incorrect status. Do you mean "in-progress"?${Color.reset}`);
   } else if (status.startsWith('do') || status.endsWith('e')) {
-    console.log(`${Background.red}Incorrect syntax. Do you mean "done"?${Color.reset}`);
+    console.log(`${Background.red}Incorrect status. Do you mean "done"?${Color.reset}`);
+  } else {
+    console.log(`${Background.red}Incorrect status${Color.reset}`);
   }
-
-
 }
 
 function findTaskById(tasks, id) {
@@ -165,6 +170,25 @@ function deleteTaskById(tasks) {
   console.log(`${Background.red}Task not found with the id: ${id}${Color.reset}`);
 }
 
+function markTodoById(tasks) {
+  if (args.length < 1 || args.length > 1) {
+    console.log('Provide a valid task id to mark as todo.');
+    return;
+  }
+  const id = args[0];
+  const task = findTaskById(tasks, id);
+
+  if (task) {
+    task.completed = (task.completed === true) && false;
+    task.inProgress = (task.inProgress === true) && false;
+    console.log(`${Background.blue}Task mark as todo.${Color.reset}`);
+    // console.log(tasks);
+    writeDataToFile(tasks);
+    return;
+  }
+  console.log(`${Background.red}Task not found with the id: ${id}${Color.reset}`);
+}
+
 function markInProgressById(tasks) {
   if (args.length < 1 || args.length > 1) {
     console.log('Provide a valid task id to mark as in progress.');
@@ -175,7 +199,7 @@ function markInProgressById(tasks) {
 
   if (task) {
     task.completed = (task.completed === true) && false;
-    task.inProgress = !task.inProgress;
+    task.inProgress = true;
     console.log(`${Background.blue}Task mark as in progress.${Color.reset}`);
     // console.log(tasks);
     writeDataToFile(tasks);
@@ -194,7 +218,7 @@ function markAsDoneById(tasks) {
 
   if (task) {
     task.inProgress = (task.inProgress === true) && false;
-    task.completed = !task.completed;
+    task.completed = true;
     console.log(`${Background.blue}Task mark as done.${Color.reset}`);
     // console.log(tasks);
     writeDataToFile(tasks);
@@ -227,6 +251,11 @@ async function checkQuery() {
       deleteTaskById(tasks);
       break;
 
+    case '--mark-todo':
+    case '-mt':
+      markTodoById(tasks);
+      break;
+
     case '--mark-in-progress':
     case '-mp':
       markInProgressById(tasks);
@@ -256,6 +285,7 @@ function displayHelp() {
   console.log(`${Color.green}--list, -l${Color.reset}\t\t\tList all tasks.\n\t\t\t\t${Color.red}Syntax:${Color.reset} --list <status | null> (e.g. --list done, --list in-progress, --list todo).\n`);
   console.log(`${Color.green}--update, -u${Color.reset}\t\t\tUpdate a task.\n\t\t\t\t${Color.red}Syntax:${Color.reset} --update <id> <new-task-description> (e.g. --update 2 "wash the dishes").\n`);
   console.log(`${Color.green}--delete, -d${Color.reset}\t\t\tDelete a task.\n\t\t\t\t${Color.red}Syntax:${Color.reset} --delete <id> (e.g. --delete 2).\n`);
+  console.log(`${Color.green}--mark-todo, -mt${Color.reset}\t\tMark a task as todo.\n\t\t\t\t${Color.red}Syntax:${Color.reset} --mark-todo <id> (e.g. --mark-todo 2).\n`);
   console.log(`${Color.green}--mark-in-progress, -mp${Color.reset}\t\tMark a task as in progress.\n\t\t\t\t${Color.red}Syntax:${Color.reset} --mark-in-progress <id> (e.g. --mark-in-progress 2).\n`);
   console.log(`${Color.green}--mark-done, -md${Color.reset}\t\tMark a task as done.\n\t\t\t\t${Color.red}Syntax:${Color.reset} --mark-done <id> (e.g. --mark-done 2).\n`);
 }
