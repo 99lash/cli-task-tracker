@@ -64,7 +64,12 @@ function retrieveTasksData() {
 function addTask(tasks) {
   tasks.sort((a, b) => a.id - b.id);
   args.forEach((taskName) => {
-    const newId = tasks[tasks.length - 1].id + 1;
+    let newId;
+    if (tasks.length > 0) {
+      newId = tasks[tasks.length - 1].id + 1;
+    } else {
+      newId = 1;
+    }
     const newTask = {
       id: newId,
       description: taskName,
@@ -245,9 +250,12 @@ function writeDataToFile(tasks) {
 }
 
 function displayHelp() {
-  console.log(`${Background.blue} Usage: ${Color.reset}\n\tnode taskcli [ operations ] [ arguments | tasks ]`);
+  console.log(`${Background.blue} Usage: ${Color.reset}\nnode taskcli [ operations ] [ arguments | tasks ]`);
   console.log(`\n${Background.blue} Operations: ${Color.reset}`);
-  console.log(`\t${Color.green}--add, -a${Color.reset}\tAdd a task.\n\t\t\t${Color.red}Syntax:${Color.reset} --add <tasks> (e.g. --add "wash dishes").\n`);
-  console.log(`\t${Color.green}--list, -l${Color.reset}\tList all tasks.\n\t\t\t${Color.red}Syntax:${Color.reset} --list.\n`);
-  console.log(`\t${Color.green}--update, -u${Color.reset}\tUpdate a task.\n\t\t\t${Color.red}Syntax:${Color.reset} --update <id> <new-task-description> (e.g. --update 2 "wash the dishes").\n`);
+  console.log(`${Color.green}--add, -a${Color.reset}\t\t\tAdd a task.\n\t\t\t\t${Color.red}Syntax:${Color.reset} --add <tasks> (e.g. --add "wash dishes").\n`);
+  console.log(`${Color.green}--list, -l${Color.reset}\t\t\tList all tasks.\n\t\t\t\t${Color.red}Syntax:${Color.reset} --list <status | null> (e.g. --list done, --list in-progress, --list todo).\n`);
+  console.log(`${Color.green}--update, -u${Color.reset}\t\t\tUpdate a task.\n\t\t\t\t${Color.red}Syntax:${Color.reset} --update <id> <new-task-description> (e.g. --update 2 "wash the dishes").\n`);
+  console.log(`${Color.green}--delete, -d${Color.reset}\t\t\tDelete a task.\n\t\t\t\t${Color.red}Syntax:${Color.reset} --delete <id> (e.g. --delete 2).\n`);
+  console.log(`${Color.green}--mark-in-progress, -mp${Color.reset}\t\tMark a task as in progress.\n\t\t\t\t${Color.red}Syntax:${Color.reset} --mark-in-progress <id> (e.g. --mark-in-progress 2).\n`);
+  console.log(`${Color.green}--mark-done, -md${Color.reset}\t\tMark a task as done.\n\t\t\t\t${Color.red}Syntax:${Color.reset} --mark-done <id> (e.g. --mark-done 2).\n`);
 }
