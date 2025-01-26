@@ -64,7 +64,7 @@ function retrieveTasksData() {
 function addTask(tasks) {
   tasks.sort((a, b) => a.id - b.id);
   args.forEach((taskName) => {
-    const newId = tasks.length + 1;
+    const newId = tasks[tasks.length - 1].id + 1;
     const newTask = {
       id: newId,
       description: taskName,
@@ -85,13 +85,39 @@ function listTasks(tasks) {
     return;
   }
 
-  // const meow = new Date(tasks[0].createdAt);
-  // console.log(meow.toLocaleDateString())
-  // console.log(meow.toLocaleTimeString())
-  const sortedTasks = tasks.sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt));
-  sortedTasks.forEach(task => {
-    console.log(task);
-  });
+  if (args.length > 1) {
+    console.log('Provide a valid status to list the tasks.');
+    return;
+  }
+  const status = (args[0]) ? args[0].toLowerCase() : 'todo';
+  const sortedDescendingTasks = tasks.sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt));
+
+  if (status === 'todo') {
+    // const meow = new Date(tasks[0].createdAt);
+    // console.log(meow.toLocaleDateString())
+    // console.log(meow.toLocaleTimeString())
+    const tasksFilteredAsTodo = sortedDescendingTasks.filter((task) => task.completed === false && task.inProgress === false);
+    console.log(tasksFilteredAsTodo);
+    return;
+  } else if (status === 'done') {
+    const tasksFilteredAsDone = sortedDescendingTasks.filter((task) => task.completed === true);
+    console.log(tasksFilteredAsDone);
+    return;
+  } else if (status === 'in-progress') {
+    const tasksFilteredAsInProgress = sortedDescendingTasks.filter((task) => task.inProgress === true);
+    console.log(tasksFilteredAsInProgress);
+    return;
+  }
+
+  if (status.startsWith('to') || status.endsWith('o')) {
+    console.log(`${Background.red}Incorrect syntax. Do you mean "todo"?${Color.reset}`);
+  } else if (status.startsWith('in') || status.endsWith('s')) {
+    console.log(`${Background.red}Incorrect syntax. Do you mean "in-progress"?${Color.reset}`);
+  } else if (status.startsWith('do') || status.endsWith('e')) {
+    console.log(`${Background.red}Incorrect syntax. Do you mean "done"?${Color.reset}`);
+  }
+
+
 }
 
 function findTaskById(tasks, id) {
@@ -100,10 +126,9 @@ function findTaskById(tasks, id) {
 
 function updateTaskById(tasks) {
   if (args.length > 2) {
-    console.log('Provide valid task description');
+    console.log('Provide a new valid task description to update.');
     return;
   }
-
   const id = args[0];
   const newDescription = args[1];
   const task = findTaskById(tasks, id);
@@ -114,8 +139,63 @@ function updateTaskById(tasks) {
     console.log(task);
     writeDataToFile(tasks);
   } else {
-    console.log(`Task not found with the id of ${id}.`)
+    console.log(`${Background.red}Task not found with the id: ${id}${Color.reset}`);
   }
+}
+
+function deleteTaskById(tasks) {
+  if (args.length < 1 || args.length > 1) {
+    console.log('Provide a valid task id to delete.');
+    return;
+  }
+  const id = args[0];
+  const task = findTaskById(tasks, id);
+
+  if (task) {
+    tasks = tasks.filter((task) => task.id !== parseInt(id));
+    writeDataToFile(tasks);
+    console.log(`${Background.blue}Task removed succesfully!${Color.reset}`)
+    return;
+  }
+  console.log(`${Background.red}Task not found with the id: ${id}${Color.reset}`);
+}
+
+function markInProgressById(tasks) {
+  if (args.length < 1 || args.length > 1) {
+    console.log('Provide a valid task id to mark as in progress.');
+    return;
+  }
+  const id = args[0];
+  const task = findTaskById(tasks, id);
+
+  if (task) {
+    task.completed = (task.completed === true) && false;
+    task.inProgress = !task.inProgress;
+    console.log(`${Background.blue}Task mark as in progress.${Color.reset}`);
+    // console.log(tasks);
+    writeDataToFile(tasks);
+    return;
+  }
+  console.log(`${Background.red}Task not found with the id: ${id}${Color.reset}`);
+}
+
+function markAsDoneById(tasks) {
+  if (args.length < 1 || args.length > 1) {
+    console.log('Provide a valid task id to mark as done.');
+    return;
+  }
+  const id = args[0];
+  const task = findTaskById(tasks, id);
+
+  if (task) {
+    task.inProgress = (task.inProgress === true) && false;
+    task.completed = !task.completed;
+    console.log(`${Background.blue}Task mark as done.${Color.reset}`);
+    // console.log(tasks);
+    writeDataToFile(tasks);
+    return;
+  }
+  console.log(`${Background.red}Task not found with the id: ${id}${Color.reset}`);
 }
 
 async function checkQuery() {
@@ -135,6 +215,21 @@ async function checkQuery() {
     case '--update':
     case '-u':
       updateTaskById(tasks);
+      break;
+
+    case '--delete':
+    case '-d':
+      deleteTaskById(tasks);
+      break;
+
+    case '--mark-in-progress':
+    case '-mp':
+      markInProgressById(tasks);
+      break;
+
+    case '--mark-done':
+    case '-md':
+      markAsDoneById(tasks);
       break;
 
     default:
